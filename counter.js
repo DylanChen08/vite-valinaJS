@@ -159,3 +159,6 @@ class EventBus {
 
   emit() { }
 }
+
+const bus  = new EventBus()
+console.log(bus);
