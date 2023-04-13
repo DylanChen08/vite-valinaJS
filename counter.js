@@ -151,14 +151,68 @@ export function setupCounter(element) {
 
 
 class EventBus {
-  on() { }
+  events = new Map()
+
+  on(eventType, handler) {
+    //this.events.get(eventType)已经是 new Set() ，往Set 里面加入 handler
+    //set 性能比数组好，因为 Set 无次序
+    if (!this.events.has(eventType)) {
+      //如果eventType里面不含有events的类型，那么我们就在map里面新增一个 Set()
+      this.events.set(eventType, new Set())
+    }
+    //如果eventType里面含有events的类型，那么我们就在map里面添加
+    this.events.get(eventType).add(handler)
+
+  }
+  emit(eventType, data) {
+    if (this.events.has(eventType)) {
+      // 遍历eventType里面的handler
+      this.events.get(eventType).forEach(handler => {
+        // console.log(handler)
+        handler(data)
+      })
+    }
+  }
+
+  off(eventType, handler) {
+    if (this.events.has(eventType)) {
+      // 如果不存在这个handler,则直接清除events里面该类型。
+      if (!handler) {
+        console.log(this.events, 'this.events')
+        this.events.delete(eventType)
+      } else {
+        // set里面删除
+        this.events.get(eventType).delete(handler)
+      }
+    }
+  }
+
 
   once() { }
 
-  off() { }
 
-  emit() { }
+
+
 }
 
-const bus  = new EventBus()
-console.log(bus);
+const bus = new EventBus()
+console.log(bus)
+bus.on('click', (data) => {
+  console.log('clicked, data: ', data)
+})
+bus.on('click', (data) => {
+  console.log('clicked2, data: ', data)
+})
+
+bus.emit('click', { a: 1 })
+bus.emit('click', { a: 2 })
+
+// bus.once('hello', (data) => {
+//   console.log('say hello, data: ', data)
+// })
+
+// bus.emit('hello', 'jirengu')
+// bus.emit('hello', 'frontend')
+
+bus.off('click')
+// bus.emit('click', {a: 1})
