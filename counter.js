@@ -58,14 +58,14 @@ export function setupCounter(element) {
 //     } else {
 //       ret[key] = deepCopy(objOrArr[key])
 //       map.set(objOrArr[key], ret[key])
-//     }      
+//     }
 //   }
 //   return ret
 // }
 // let obj2 = deepCopy(obj)
 // console.log(obj2)
 
-// const a = 
+// const a =
 
 
 // 对于一个函数，如何深拷贝
@@ -102,7 +102,7 @@ export function setupCounter(element) {
 
 // function curry(fn) {
 //   console.log(fn.length);
-//   const args  =  [] 
+//   const args  =  []
 //   return function (...rest) {
 //     console.log('rest',rest)
 //     args = args.concat(rest)
@@ -111,7 +111,7 @@ export function setupCounter(element) {
 
 
 // sum(1,2,3,4)
-// let newSum  = curry(sum)  
+// let newSum  = curry(sum)
 // // newSum(1)(2)(3,4)(5)
 // newSum(1,2,3,4)
 
@@ -160,6 +160,7 @@ class EventBus {
       //如果eventType里面不含有events的类型，那么我们就在map里面新增一个 Set()
       this.events.set(eventType, new Set())
     }
+    handler.type = 'on'
     //如果eventType里面含有events的类型，那么我们就在map里面添加
     this.events.get(eventType).add(handler)
 
@@ -170,6 +171,11 @@ class EventBus {
       this.events.get(eventType).forEach(handler => {
         // console.log(handler)
         handler(data)
+
+        if (handler.type === 'once') {
+          this.events.get(eventType).delete(handler)
+
+        }
       })
     }
   }
@@ -187,9 +193,13 @@ class EventBus {
     }
   }
 
-
-  once() { }
-
+  once(eventType, handler) {
+    if(!this.events.has(eventType)){
+      this.events.set(eventType, new Set())
+    }
+    handler.type = 'once'
+    this.events.get(eventType).add(handler)
+  }
 
 
 
@@ -207,12 +217,12 @@ bus.on('click', (data) => {
 bus.emit('click', { a: 1 })
 bus.emit('click', { a: 2 })
 
-// bus.once('hello', (data) => {
-//   console.log('say hello, data: ', data)
-// })
+bus.once('hello', (data) => {
+  console.log('say hello, data: ', data)
+})
 
-// bus.emit('hello', 'jirengu')
-// bus.emit('hello', 'frontend')
+bus.emit('hello', 'dcwonderland')
+bus.emit('hello', 'frontend')
 
 bus.off('click')
-// bus.emit('click', {a: 1})
+bus.emit('click', {a: 1})
