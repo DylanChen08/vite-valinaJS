@@ -307,3 +307,36 @@ export function setupCounter(element) {
 //
 // let c2 = mynew(Cat, 'wangcai')
 // console.log(c2)
+
+
+// function sum() {
+//     // console.log(222)
+//     return this.a + this.b
+// }
+//
+// sum.call({a: 1, b: 2})
+
+// sum.call({a: 1, b: 2})
+
+//实现一个call()
+Function.prototype.mycall = function (thisArg, ...args) {
+    //为了确保 thisArg 指向 this , 将thisArg增加一个属性__fn__，并将this赋值给他 。
+    // thisArg.__fn__ = this
+    // thisArg.__fn__(...args)
+    Object.prototype[symbol] = this
+    //这里使用symbol的原因是symbol的值是随机的，每个symbol都不一样
+    //可以通过 Symbol()  ===  Symbol() ==> false 来验证
+    let symbol = Symbol()
+    let ret = thisArg[symbol](...args)
+    delete Object.prototype[symbol]
+    return ret
+}
+
+function a(m, n) {
+    console.log(this)
+    console.log(m + n)
+}
+
+a.mycall({a: 1}, 3, 4)
+a.call({a: 1}, 3, 4)
+
