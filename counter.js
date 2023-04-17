@@ -343,3 +343,26 @@ export function setupCounter(element) {
 // a.mycall({a: 1}, 3, 4)
 // a.call({a: 1}, 3, 4)
 
+
+//实现一个apply()
+// 和call()原理一样 唯一不同的是apply()不用结构
+// Function.prototype.myapply = function (thisArg, args) {
+//     let symbol = Symbol()
+//     Object.prototype[symbol] = this
+//     let ret = thisArg[symbol](...args)
+//     delete Object.prototype[symbol]
+//     return ret
+// }
+//
+// function a(m, n) {
+//     console.log(this)
+//     console.log(m + n)
+// }
+//
+// a.myapply({b: 1}, [4, 5])
+
+
+
+
+
+
