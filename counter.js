@@ -248,24 +248,62 @@ export function setupCounter(element) {
 
 
 //手写一个instanceof
-function myinstanceof(instance, func) {
-    let __proto__ = instance.__proto__
-    while (__proto__) {
-        if (__proto__ === func.prototype) {
-            //循环判断，一直找到func的原型构造,如果存在就返回true
-            return true
-        } else {
-            //否则就把当前实例的原型构造返回去
-            __proto__ = __proto__.__proto__
-        }
-    }
+// function myinstanceof(instance, func) {
+//     let __proto__ = instance.__proto__
+//     while (__proto__) {
+//         if (__proto__ === func.prototype) {
+//             //循环判断，一直找到func的原型构造,如果存在就返回true
+//             return true
+//         } else {
+//             //否则就把当前实例的原型构造返回去
+//             __proto__ = __proto__.__proto__
+//         }
+//     }
+//
+//
+//     return instance.__proto__ === func.prototype
+// }
+//
+// function Cat() {
+// }
+//
+// let c = new Cat()
+// console.log(myinstanceof(c, Object))
 
 
-    return instance.__proto__ === func.prototype
-}
+// function Cat(name) {
+//     this.name = name
+//
+//     //需要注意的是，如果函数里面有 return {}  或 return []
+//     //则函数被 new 后返回的就不是name 了 , 而是返回 {} 或者 []
+// }
 
-function Cat() {
-}
-
-let c = new Cat()
-console.log(myinstanceof(c, Object))
+// function myNew(func, ...rest) {
+//     // 这里不能直接用 let obj = {} , 会导致 obj 找不到 func.prototype 的 prototype(原型)
+//     let obj = Object.create(func.prototype)
+//     func.apply(obj, rest)
+//     return obj
+// }
+//
+// function mynew(func, ...rest) {
+//     let obj = Object.create(func.prototype)
+//     let ret = func.apply(obj, rest)
+//     if((typeof ret === 'object' && ret!== null) || typeof ret === 'function') {
+//         return ret
+//     } else {
+//         return obj
+//     }
+// }
+//
+// Cat.prototype.sayName = function () {
+//     console.log(`My name is ${this.name}`)
+// }
+//
+// const c = new Cat('x')
+// c.sayName()
+//
+// // let c1 = new Cat('huahua')
+// // c1.sayName()
+//
+// let c2 = mynew(Cat, 'wangcai')
+// console.log(c2)
