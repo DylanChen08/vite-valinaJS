@@ -1,9 +1,10 @@
 import './style.css'
 import javascriptLogo from './javascript.svg'
 import { setupCounter } from './counter.js'
+import { d } from './src/debounce.js'
 
 document.querySelector('#app').innerHTML = `
-  <div>
+  <div style='height:10000px'>
     <a href="https://vitejs.dev" target="_blank">
       <img src="" class="logo" alt="Vite logo" />
     </a>
@@ -21,5 +22,6 @@ document.querySelector('#app').innerHTML = `
 `
 
 setupCounter(document.querySelector('#counter'))
+d()
 
 // console.log(11111);

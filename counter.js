@@ -429,43 +429,43 @@ export function setupCounter(element) {
 
 //考虑new之后的mybind
 
-Function.prototype.mybind = function (thisArg, ...args) {
-    let fn = this
-    //
-    thisArg = thisArg || window
+// Function.prototype.mybind = function (thisArg, ...args) {
+//     let fn = this
+//     //
+//     thisArg = thisArg || window
 
-    const boundFn = function (...rest) {
-        //使用Object.create 创建一个新的对象，使其挂载在Object 原型上面。
-        let context = Object.create(fn.prototype)
-        //如果是通过 new Function 执行的
-        if (this instanceof boundFn) {
-            //这里我们可以看到我们已经不管原来bind的this是什么了，直接apply context
-            //通过这样来实现对于new之后的bind的特性———不管原来bind什么 。
-            fn.apply(context, [...args, ...args])
-            return context
-        } else { //否则是通过类似a.bind的调用
-            return fn.apply(thisArg, [...args, ...args])
-        }
-    }
+//     const boundFn = function (...rest) {
+//         //使用Object.create 创建一个新的对象，使其挂载在Object 原型上面。
+//         let context = Object.create(fn.prototype)
+//         //如果是通过 new Function 执行的
+//         if (this instanceof boundFn) {
+//             //这里我们可以看到我们已经不管原来bind的this是什么了，直接apply context
+//             //通过这样来实现对于new之后的bind的特性———不管原来bind什么 。
+//             fn.apply(context, [...args, ...args])
+//             return context
+//         } else { //否则是通过类似a.bind的调用
+//             return fn.apply(thisArg, [...args, ...args])
+//         }
+//     }
 
-    return function (...rest) {
-        //return fn.call(thisArg, ...[...args, ...rest])
-        return fn.apply(thisArg, [...args, ...rest])
-    }
-}
+//     return function (...rest) {
+//         //return fn.call(thisArg, ...[...args, ...rest])
+//         return fn.apply(thisArg, [...args, ...rest])
+//     }
+// }
 
-function Cat(name) {
-    this.name = name
-  }
+// function Cat(name) {
+//     this.name = name
+//   }
   
-  Cat.prototype.sayName = function() {
-    console.log(`my name is ${this.name}`)
-  }
+//   Cat.prototype.sayName = function() {
+//     console.log(`my name is ${this.name}`)
+//   }
   
-  let Cat2 = Cat.mybind({name: 'wangcai'})
-  let c2 = new Cat2('huahua')
-  console.log(c2)
+//   let Cat2 = Cat.mybind({name: 'wangcai'})
+//   let c2 = new Cat2('huahua')
+//   console.log(c2)
   
-  let Cat3 = Cat.bind({name: 'wangcai'})
-  let c3 = new Cat3('huahua')
-  console.log(c3)
+//   let Cat3 = Cat.bind({name: 'wangcai'})
+//   let c3 = new Cat3('huahua')
+//   console.log(c3)
