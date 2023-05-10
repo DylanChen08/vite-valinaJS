@@ -387,28 +387,85 @@ export function setupCounter(element) {
 
 //不用call或apply实现bind
 
-function a(m,n) {
-    console.log(this)
-    console.log(m+n)
-}
+// function a(m,n) {
+//     console.log(this)
+//     console.log(m+n)
+// }
 
 
-Function.prototype.mybind2 = function (thisArg, ...args) {
+// Function.prototype.mybind2 = function (thisArg, ...args) {
+//     let fn = this
+//     // console.log('...args',...args)
+//     thisArg = thisArg || window
+//     return function (...rest) {
+//         let symbol = Symbol()
+//         Object.prototype[symbol] = fn
+//         let ret = thisArg[symbol](...[...args, ...rest])
+//         delete Object.prototype[symbol]
+//         return ret
+//     }
+// }
+
+// // let fn1 = a.bind('abc', 100)
+// // fn1(3, 4)
+
+// let fn2 = a.mybind2('abc', 100,101,102,1003)
+// fn2(5, 6)
+
+
+// function Cat(name) {
+//     this.name = name
+// }
+
+// Cat.prototype.sayName = function () {
+//     console.log(`my name is ${this.name}`)
+// }
+
+
+// let Cat2 = Cat.bind({name:'wangcai'})
+// let Cat3 = new Cat2({name:'huahua'})
+// console.log(Cat3)
+
+
+//考虑new之后的mybind
+
+Function.prototype.mybind = function (thisArg, ...args) {
     let fn = this
-    // console.log('...args',...args)
+    //
     thisArg = thisArg || window
+
+    const boundFn = function (...rest) {
+        //使用Object.create 创建一个新的对象，使其挂载在Object 原型上面。
+        let context = Object.create(fn.prototype)
+        //如果是通过 new Function 执行的
+        if (this instanceof boundFn) {
+            //这里我们可以看到我们已经不管原来bind的this是什么了，直接apply context
+            //通过这样来实现对于new之后的bind的特性———不管原来bind什么 。
+            fn.apply(context, [...args, ...args])
+            return context
+        } else { //否则是通过类似a.bind的调用
+            return fn.apply(thisArg, [...args, ...args])
+        }
+    }
+
     return function (...rest) {
-        let symbol = Symbol()
-        Object.prototype[symbol] = fn
-        let ret = thisArg[symbol](...[...args, ...rest])
-        delete Object.prototype[symbol]
-        return ret
+        //return fn.call(thisArg, ...[...args, ...rest])
+        return fn.apply(thisArg, [...args, ...rest])
     }
 }
 
-// let fn1 = a.bind('abc', 100)
-// fn1(3, 4)
-
-let fn2 = a.mybind2('abc', 100,101,102,1003)
-fn2(5, 6)
-
+function Cat(name) {
+    this.name = name
+  }
+  
+  Cat.prototype.sayName = function() {
+    console.log(`my name is ${this.name}`)
+  }
+  
+  let Cat2 = Cat.mybind({name: 'wangcai'})
+  let c2 = new Cat2('huahua')
+  console.log(c2)
+  
+  let Cat3 = Cat.bind({name: 'wangcai'})
+  let c3 = new Cat3('huahua')
+  console.log(c3)
