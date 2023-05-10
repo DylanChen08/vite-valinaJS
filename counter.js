@@ -345,7 +345,7 @@ export function setupCounter(element) {
 
 
 //实现一个apply()
-// 和call()原理一样 唯一不同的是apply()不用结构
+// 和call()原理一样 唯一不同的是apply()不用解构
 // Function.prototype.myapply = function (thisArg, args) {
 //     let symbol = Symbol()
 //     Object.prototype[symbol] = this
@@ -362,7 +362,53 @@ export function setupCounter(element) {
 // a.myapply({b: 1}, [4, 5])
 
 
+//用call或apply实现一个bind()
+
+// let a =function () {
+//
+// }
+//
+// Function.prototype.mybind = function(thisArg, ...args) {
+//     let fn = this
+//     //
+//     thisArg = thisArg||window
+//     return function(...rest) {
+//         //return fn.call(thisArg, ...[...args, ...rest])
+//         return fn.apply(thisArg, [...args, ...rest])
+//     }
+// }
+//
+// let fn1 = a.bind({o:1})
+// fn1(3,4)
+//
+// let fn2 = a.mybind({o: 1})
+// fn2(5, 6)
 
 
+//不用call或apply实现bind
 
+function a(m,n) {
+    console.log(this)
+    console.log(m+n)
+}
+
+
+Function.prototype.mybind2 = function (thisArg, ...args) {
+    let fn = this
+    // console.log('...args',...args)
+    thisArg = thisArg || window
+    return function (...rest) {
+        let symbol = Symbol()
+        Object.prototype[symbol] = fn
+        let ret = thisArg[symbol](...[...args, ...rest])
+        delete Object.prototype[symbol]
+        return ret
+    }
+}
+
+// let fn1 = a.bind('abc', 100)
+// fn1(3, 4)
+
+let fn2 = a.mybind2('abc', 100,101,102,1003)
+fn2(5, 6)
 
