@@ -36,17 +36,24 @@ export function ff(params) {
 
 
 // filter
-Array.prototype._filter = function (callback, thisArg) {
-    let result = []
-    for (let i = 0; i < this.length; i++) {
-        // console.log(thisArg,this[i], i, this);
-        if (callback.bind(thisArg)(this[i], i, this)) {
-            result.push(this[i])
-        }
+//  
+
+
+//reduce 
+
+Array.prototype._reduce = function (callback,inintialValue) {
+    let previousValue 
+    //处理没有初始值的情况
+    if(inintialValue===undefined){
+        previousValue =  this[0]
+    }else{
+        previousValue = callback(inintialValue,this[0])
     }
-    return result
+    for (let i = 0; i < array.length; i++) {
+        previousValue = callback(previousValue,this[i])
+    }
+    return previousValue
 }
 
-let a  = [-1,9,4,3,2,-12,0]
-
-console.log(a._filter(c=>c>=0))
+let arr3 = []
+console.log(arr)
