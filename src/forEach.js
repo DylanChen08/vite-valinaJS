@@ -55,5 +55,6 @@ Array.prototype._reduce = function (callback,inintialValue) {
     return previousValue
 }
 
-let arr3 = []
-console.log(arr)
+let a  = [-1,9,4,3,2,-12,0]
+
+console.log(a._filter(c=>c>=0))
