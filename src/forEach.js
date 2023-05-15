@@ -42,6 +42,14 @@ export function ff(params) {
 //reduce 
 
 Array.prototype._reduce = function (callback,inintialValue) {
+    //如果传入的数组为空,抛出异常
+    if(this.length===0){
+        if(inintialValue!==undefined){
+            return inintialValue
+        }else{
+            throw new TypeError('Reduce of empty array wiht no initial value')
+        }
+    }
     let previousValue 
     //处理没有初始值的情况
     if(inintialValue===undefined){
@@ -55,6 +63,9 @@ Array.prototype._reduce = function (callback,inintialValue) {
     return previousValue
 }
 
-let a  = [-1,9,4,3,2,-12,0]
+let a  = []
 
-console.log(a._filter(c=>c>=0))
+// console.log(a._filter(c=>c>=0))
+
+console.log(a._reduce((v1,v2)=>v1+v2,100))
+// console.log(a._reduce((v1,v2)=>v1+v2,100))
