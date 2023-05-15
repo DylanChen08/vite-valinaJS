@@ -48,5 +48,4 @@ Array.prototype._filter = function (callback, thisArg) {
 }
 
 let a  = [-1,9,4,3,2,-12,0]
-
 console.log(a._filter(c=>c>=0))
