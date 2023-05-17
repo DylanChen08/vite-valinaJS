@@ -36,10 +36,10 @@ export function ff(params) {
 
 
 // filter
-//  
+//
 
 
-//reduce 
+//reduce
 
 // Array.prototype._reduce = function (callback,inintialValue) {
 //     //如果传入的数组为空,抛出异常
@@ -50,7 +50,7 @@ export function ff(params) {
 //             throw new TypeError('Reduce of empty array wiht no initial value')
 //         }
 //     }
-//     let previousValue 
+//     let previousValue
 //     //处理没有初始值的情况
 //     if(inintialValue===undefined){
 //         previousValue =  this[0]
@@ -71,16 +71,39 @@ export function ff(params) {
 // console.log(a._reduce((v1,v2)=>v1+v2,100))
 
 
+// try {
+//     // nonExistentFunction();
+//     let a = 0
+//     console.log(b)
+//
+//   } catch (error) {
+//     // Object.keys(error).forEach(v=>{console.log(v)})
+//     console.log(error?'true':'fa');
+//     // Expected output: ReferenceError: nonExistentFunction is not defined
+//     // (Note: the exact output may be browser-dependent)
+//   }
 
-try {
-    // nonExistentFunction();
-    let a = 0 
-    console.log(b)
-   
-  } catch (error) {
-    // Object.keys(error).forEach(v=>{console.log(v)})
-    console.log(error?'true':'fa');
-    // Expected output: ReferenceError: nonExistentFunction is not defined
-    // (Note: the exact output may be browser-dependent)
-  }
-  
+
+//flat
+
+const myFlap = (arr, depth) => {
+    // 使用reduce
+    return arr.reduce((result, val) => {
+        //如果深度小于0，那么就停止拍平
+        if (depth <= 0) return arr
+        // 判断如果不是数组，则存起来
+        if (!Array.isArray(val)) {
+            // console.log('val',val)
+            // result.push(val)
+        } else {
+            //如果是数组，那就解构后与flat之后的值拼接起来。
+            console.log('f', ...result, ...myFlap(val))
+            result = [...result, ...myFlap(val, depth - 1)]
+        }
+        return result
+    }, [])
+}
+
+console.log(myFlap([3, 4, 5, ['a', 'b', [6, [7]]]],1))
+
+
