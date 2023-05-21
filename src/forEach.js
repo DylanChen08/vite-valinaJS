@@ -86,24 +86,49 @@ export function ff(params) {
 
 //flat
 
-const myFlap = (arr, depth) => {
-    // 使用reduce
-    return arr.reduce((result, val) => {
-        //如果深度小于0，那么就停止拍平
-        if (depth <= 0) return arr
-        // 判断如果不是数组，则存起来
-        if (!Array.isArray(val)) {
-            // console.log('val',val)
-            // result.push(val)
-        } else {
-            //如果是数组，那就解构后与flat之后的值拼接起来。
-            console.log('f', ...result, ...myFlap(val))
-            result = [...result, ...myFlap(val, depth - 1)]
-        }
-        return result
-    }, [])
+// const myFlap = (arr, depth) => {
+//     // 使用reduce
+//     return arr.reduce((result, val) => {
+//         //如果深度小于0，那么就停止拍平
+//         if (depth <= 0) return arr
+//         // 判断如果不是数组，则存起来
+//         if (!Array.isArray(val)) {
+//             // console.log('val',val)
+//             // result.push(val)
+//         } else {
+//             //如果是数组，那就解构后与flat之后的值拼接起来。
+//             console.log('f', ...result, ...myFlap(val))
+//             result = [...result, ...myFlap(val, depth - 1)]
+//         }
+//         return result
+//     }, [])
+// }
+
+// console.log(myFlap([3, 4, 5, ['a', 'b', [6, [7]]]],1))
+
+
+// 手写class继承
+function Animal(name,age) {
+    this.name = name
+    this.age = age
 }
 
-console.log(myFlap([3, 4, 5, ['a', 'b', [6, [7]]]],1))
+Animal.prototype.walk = function () {
+    console.log(`${this.name} is walking`)
+}
 
+function Cat(name,age,color) {
+    // 1.通过父类.call获取父类的属性
+    Animal.call(this,name,age)
+    this.color = color
+}
 
+//原型链继承
+Cat.prototype  = Object.create(Animal.prototype)
+
+Cat.prototype.speak = function (params) {
+    console.log(`${this.name}is meowing`)
+}
+Cat.prototype.constructor = Cat
+
+let cat = new Cat('mimi',3,white)
