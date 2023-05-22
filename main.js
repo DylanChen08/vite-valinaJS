@@ -3,6 +3,7 @@ import javascriptLogo from './javascript.svg'
 import { setupCounter } from './counter.js'
 import { d } from './src/debounce.js'
 import { ff } from './src/forEach.js'
+import { pr } from './src/myPromise.js'
 
 document.querySelector('#app').innerHTML = `
   <div style='height:10000px'>
@@ -25,5 +26,6 @@ document.querySelector('#app').innerHTML = `
 setupCounter(document.querySelector('#counter'))
 d()
 ff()
+pr()
 
 // console.log(11111);
