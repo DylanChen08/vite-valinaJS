@@ -107,7 +107,7 @@ export function ff(params) {
 // console.log(myFlap([3, 4, 5, ['a', 'b', [6, [7]]]],1))
 
 
-// 手写class继承
+// 手写原型继承
 function Animal(name,age) {
     this.name = name
     this.age = age
@@ -132,3 +132,18 @@ Cat.prototype.speak = function (params) {
 Cat.prototype.constructor = Cat
 
 let cat = new Cat('mimi',3,white)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
