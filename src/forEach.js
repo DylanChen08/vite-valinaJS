@@ -137,40 +137,100 @@ export function ff(params) {
 //手写 Class - class其实是原型的语法糖
 
 
-class Animal {
-    // constructor其实是相当于 function Animal(name,age) {this.name = name this.age = age}
-    constructor(name, age) {
-        this.name = name
-        this.age = age
-    }
+// class Animal {
+//     // constructor其实是相当于 function Animal(name,age) {this.name = name this.age = age}
+//     constructor(name, age) {
+//         this.name = name
+//         this.age = age
+//     }
+//
+//     walk() {
+//         console.log(`${this.name} is walking`)
+//     }
+// }
+//
+// class Cat extends Animal {
+//     constructor(name, age, color) {
+//         // 相当于
+//         //function Cat(name,age,color) {
+//         // //     // 1.通过父类.call获取父类的属性
+//         // //     Animal.call(this,name,age)
+//         // //     this.color = color
+//         // // }
+//         super(name, age)
+//         this.color = color
+//     }
+//
+//     speak() {
+//         console.log(`${this.name} is meowing`)
+//     }
+// }
+//
+// let cat = new Cat('mimi',3,'white')
+// cat.walk()
+// cat.speak()
 
-    walk() {
-        console.log(`${this.name} is walking`)
+
+// 用 promise 封装 delay
+
+
+// function delay(timeout) {
+//     return new Promise((resolve, reject) => {
+//         setTimeout(resolve, timeout)
+//     })
+// }
+
+// 另一种写法
+
+// const delay = timeout => new Promise((resolve, reject) => {
+//     setTimeout(resolve, timeout)
+// })
+//
+// delay(1000)
+//     .then(() => {
+//         console.log(1)
+//     })
+//     .then(() => delay(1000))
+//     .then(() => {
+//         console.log(2)
+//     })
+//     .then(() => delay(1000))
+//     .then(() => {
+//         console.log(3)
+//     })
+
+
+// 实现大串字符相加
+const sum = (str1, str2) => {
+    // 逻辑列竖式，按位相加
+    // 把字符串转化为数组，不断遍历
+
+    let arr1 = str1.split(' ').map(ch => parseInt((ch)))
+    let arr2 = str2.split(' ').map(ch => parseInt((ch)))
+    let result = []
+    let pos = 0  // 是否进位
+    let v1
+    let v2
+
+    while (arr1.length > 0 || arr2.length > 0) {
+        v1 = arr1.length > 0 ? arr1.pop() : 0
+        v2 = arr2.length > 0 ? arr2.pop() : 0
+        pos = 0
+        if (v1 + v2 + pos >= 10) {
+            //进位,顺序是从前往后加
+            result.unshift(v1 + v2 + pos - 10)
+            pos = 1
+        }else {
+            result.unshift(v1+v2+pos)
+        }
+        if(pos===1){
+            result.unshift(pos)
+        }
+        return result.join('')
     }
 }
 
-class Cat extends Animal {
-    constructor(name, age, color) {
-        // 相当于
-        //function Cat(name,age,color) {
-        // //     // 1.通过父类.call获取父类的属性
-        // //     Animal.call(this,name,age)
-        // //     this.color = color
-        // // }
-        super(name, age)
-        this.color = color
-    }
-
-    speak() {
-        console.log(`${this.name} is meowing`)
-    }
-}
-
-let cat = new Cat('mimi',3,'white')
-cat.walk()
-cat.speak()
-
-
+console.log(sum('234234234234234','324143423414341234'))
 
 
 
