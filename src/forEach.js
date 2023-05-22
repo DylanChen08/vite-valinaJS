@@ -107,33 +107,68 @@ export function ff(params) {
 // console.log(myFlap([3, 4, 5, ['a', 'b', [6, [7]]]],1))
 
 
-// 手写原型继承
-function Animal(name,age) {
-    this.name = name
-    this.age = age
+// // 手写原型继承
+// function Animal(name,age) {
+//     this.name = name
+//     this.age = age
+// }
+//
+// Animal.prototype.walk = function () {
+//     console.log(`${this.name} is walking`)
+// }
+//
+// function Cat(name,age,color) {
+//     // 1.通过父类.call获取父类的属性
+//     Animal.call(this,name,age)
+//     this.color = color
+// }
+//
+// //原型链继承
+// Cat.prototype  = Object.create(Animal.prototype)
+//
+// Cat.prototype.speak = function (params) {
+//     console.log(`${this.name}is meowing`)
+// }
+// Cat.prototype.constructor = Cat
+//
+// let cat = new Cat('mimi',3,white)
+
+
+//手写 Class - class其实是原型的语法糖
+
+
+class Animal {
+    // constructor其实是相当于 function Animal(name,age) {this.name = name this.age = age}
+    constructor(name, age) {
+        this.name = name
+        this.age = age
+    }
+
+    walk() {
+        console.log(`${this.name} is walking`)
+    }
 }
 
-Animal.prototype.walk = function () {
-    console.log(`${this.name} is walking`)
+class Cat extends Animal {
+    constructor(name, age, color) {
+        // 相当于
+        //function Cat(name,age,color) {
+        // //     // 1.通过父类.call获取父类的属性
+        // //     Animal.call(this,name,age)
+        // //     this.color = color
+        // // }
+        super(name, age)
+        this.color = color
+    }
+
+    speak() {
+        console.log(`${this.name} is meowing`)
+    }
 }
 
-function Cat(name,age,color) {
-    // 1.通过父类.call获取父类的属性
-    Animal.call(this,name,age)
-    this.color = color
-}
-
-//原型链继承
-Cat.prototype  = Object.create(Animal.prototype)
-
-Cat.prototype.speak = function (params) {
-    console.log(`${this.name}is meowing`)
-}
-Cat.prototype.constructor = Cat
-
-let cat = new Cat('mimi',3,white)
-
-
+let cat = new Cat('mimi',3,'white')
+cat.walk()
+cat.speak()
 
 
 
