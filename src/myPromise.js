@@ -71,7 +71,6 @@ export const pr = () => {
 // ]).then((values) => console.log(values));
 
 
-
 // let p1 = new Promise((resolve, reject) => setTimeout(resolve, Math.random()*1000, 1))
 // let p2 = new Promise((resolve, reject) => setTimeout(resolve, Math.random()*1000, 2))
 // let p3 = new Promise((resolve, reject) => setTimeout(reject, Math.random()*1000, 3))
@@ -104,15 +103,131 @@ export const pr = () => {
 //
 
 
-let thenable = {
-    then: (resolve, reject) => {
-        resolve(1)
-    }
-}
-Promise.resolve(thenable).then(v => {
-    console.log(v)
-})
+// let thenable = {
+//     then: (resolve, reject) => {
+//         resolve(1)
+//     }
+// }
+// Promise.resolve(thenable).then(v => {
+//     console.log(v)
+// })
+//
+// Promise.resolve(1).then(v => {
+//     console.log(v)
+// })
 
-Promise.resolve(1).then(v => {
-    console.log(v)
-})
+
+// Promise.all = function (iterable) {
+//     //iterable 可以是promise类型数组 promise.all([promise1,promise2,promise3]) 或者非Promise类型 promise.all([1,2,3]) 或者字符串 promise.all('hello')
+//     //判断里面的每一项，如果是Promise对象，则使用，如果不是则用Promise.resolve转成Promise对象
+//     let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))  //结构变成数组，包含Promise对象
+//     //如果迭代器是空的，那么直接返回 promise.resolve([])空数组
+//     if (arr.length === 0) return Promise.resolve([])
+//     //得到一个Promise对象
+//     return new Promise((resolve, reject) => {
+//         let results = []
+//         let settledCount = 0  //记录result的数量
+//         // 使用let i 的原因是 let具有块级作用域 即使是在.then()里面使用，也是会保存原来的结果
+//         for (let i in arr) {
+//             //不用push的原因，会影响顺序
+//             arr[i].then(val => {
+//                 results[i] = val
+//             }, reject).finally(() => {
+//                 settledCount++
+//                 if (settledCount === arr.length) { //如果resolve的长度等于arr.length
+//                     resolve(results)
+//                 }
+//             })
+//         }
+//     })
+// }
+
+//test
+// let p1 = new Promise(r => setTimeout(r, 3000, 1))
+// let p2 = new Promise((r, j) => setTimeout(j, 1000, 2))
+// let p3 = new Promise(r => setTimeout(r, 2000, 3))
+
+// Promise.all([p1, p2, p3])
+//     .then(data => console.log(data))
+//     .catch(e => console.error(e))
+//
+// Promise.all('hello').then(data => console.log(data))
+//
+// Promise.all('').then(data => console.log(data))
+//
+// Promise.all([Promise.resolve(2), 3]).then(data => console.log(data))
+
+
+// Promise.race = function (iterable) {
+//     let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))
+//     return new Promise((resolve, reject) => {
+//         //如果传入是空的数组那么一直处于pending状态，那么下面的for循环将不会执行。
+//         for (let i = 0; i < arr.length; i++) {
+//             //中间任何一个成功或失败，立刻执行
+//             arr[i].then(resolve, reject)
+//         }
+//     })
+// }
+//
+//
+// //test
+// let p1 = new Promise(r => setTimeout(r, 3000, 1))
+// let p2 = new Promise((r, j) => setTimeout(j, 1000, 2))
+// let p3 = new Promise(r => setTimeout(r, 500, 3))
+//
+// // Promise.race([p1, p2, p3])
+// //     .then(data => console.log(data))
+// //     .catch(e => console.error(e))
+// //
+// // Promise.race('hello').then(data => console.log(data))
+// //
+// // console.log(Promise.race(''))
+//
+// Promise.race([Promise.resolve(2), 3]).then(data => console.log(data))
+
+
+Promise.allSettled = function (iterable) {
+// promise.allSettled 即便是失败了也会存在正常的结果里面，所以没有catch
+    let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))
+    if (arr.length === 0) return Promise.resolve([])
+
+    return new Promise((resolve, reject) => {
+        let results = []
+        let count = 0
+        for (let i in arr) {
+            arr[i].then(value => {
+                //存取成功的结果
+                results[i] = {status: 'fulfilled', value}
+            }, reason => {
+                //存取失败的结果
+                results[i] = {status: 'rejected', reason}
+            }).finally(() => {
+                count++
+                if (count === arr.length) {
+                    resolve(results)
+                }
+            })
+        }
+    })
+}
+
+let p1 = new Promise(r => setTimeout(r, 3000, 1))
+let p2 = new Promise((r, j) => setTimeout(j, 1000, 2))
+let p3 = new Promise(r => setTimeout(r, 500, 3))
+
+Promise.allSettled([p1, p2, p3])
+    .then(data => console.log(data))
+    .catch(e => console.error(e))
+
+Promise.allSettled('hello').then(data => console.log(data))
+
+Promise.allSettled('').then(data => console.log(data))
+
+Promise.allSettled([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))
+
+
+
+
+
+
+
