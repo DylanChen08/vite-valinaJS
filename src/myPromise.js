@@ -186,48 +186,78 @@ export const pr = () => {
 // Promise.race([Promise.resolve(2), 3]).then(data => console.log(data))
 
 
-Promise.allSettled = function (iterable) {
-// promise.allSettled 即便是失败了也会存在正常的结果里面，所以没有catch
-    let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))
-    if (arr.length === 0) return Promise.resolve([])
+// Promise.allSettled = function (iterable) {
+// // promise.allSettled 即便是失败了也会存在正常的结果里面，所以没有catch
+//     let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))
+//     if (arr.length === 0) return Promise.resolve([])
+//
+//     return new Promise((resolve, reject) => {
+//         let results = []
+//         let count = 0
+//         for (let i in arr) {
+//             arr[i].then(value => {
+//                 //存取成功的结果
+//                 results[i] = {status: 'fulfilled', value}
+//             }, reason => {
+//                 //存取失败的结果
+//                 results[i] = {status: 'rejected', reason}
+//             }).finally(() => {
+//                 count++
+//                 if (count === arr.length) {
+//                     resolve(results)
+//                 }
+//             })
+//         }
+//     })
+// }
 
+
+
+
+// let p1 = new Promise(r => setTimeout(r, 3000, 1))
+// let p2 = new Promise((r, j) => setTimeout(j, 1000, 2))
+// let p3 = new Promise(r => setTimeout(r, 500, 3))
+//
+// Promise.allSettled([p1, p2, p3])
+//     .then(data => console.log(data))
+//     .catch(e => console.error(e))
+//
+// Promise.allSettled('hello').then(data => console.log(data))
+//
+// Promise.allSettled('').then(data => console.log(data))
+//
+// Promise.allSettled([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))
+
+
+
+
+Promise.any = function(iterable) {
+    let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))
+    if(arr.length === 0) return Promise.reject('All promise rejected')
     return new Promise((resolve, reject) => {
-        let results = []
-        let count = 0
-        for (let i in arr) {
-            arr[i].then(value => {
-                //存取成功的结果
-                results[i] = {status: 'fulfilled', value}
-            }, reason => {
-                //存取失败的结果
-                results[i] = {status: 'rejected', reason}
-            }).finally(() => {
-                count++
-                if (count === arr.length) {
-                    resolve(results)
+        let rejectCount = 0
+        for(let i=0; i<arr.length; i++) {
+            arr[i].then(resolve, reason => {
+                rejectCount++
+                if(rejectCount === arr.length) {
+                    reject('All promises rejected')
                 }
             })
         }
     })
 }
 
+//test
 let p1 = new Promise(r => setTimeout(r, 3000, 1))
-let p2 = new Promise((r, j) => setTimeout(j, 1000, 2))
-let p3 = new Promise(r => setTimeout(r, 500, 3))
+let p2 = new Promise((r,j) => setTimeout(j, 1000, 2))
+let p3 = new Promise(r => setTimeout(() => r(3), 500))
 
-Promise.allSettled([p1, p2, p3])
+Promise.any([p1, p2, p3])
     .then(data => console.log(data))
     .catch(e => console.error(e))
 
-Promise.allSettled('hello').then(data => console.log(data))
+Promise.any('hello').then(data => console.log(data))
 
-Promise.allSettled('').then(data => console.log(data))
+Promise.any('').then(data => console.log(data), reason => console.error(reason))
 
-Promise.allSettled([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))
-
-
-
-
-
-
-
+Promise.any([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))
