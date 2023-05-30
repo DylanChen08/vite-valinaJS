@@ -231,33 +231,93 @@ export const pr = () => {
 
 
 
-Promise.any = function(iterable) {
+// Promise.any = function(iterable) {
+//         //iterable 可以是promise类型数组 promise.all([promise1,promise2,promise3]) 或者非Promise类型 promise.all([1,2,3]) 或者字符串 promise.all('hello')
+//     //判断里面的每一项，如果是Promise对象，则使用，如果不是则用Promise.resolve转成Promise对象
+//     let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))
+//     //如果传入的是个空对象
+//     if(arr.length === 0) return Promise.reject('All promise rejected')
+//     return new Promise((resolve, reject) => {
+//         let rejectCount = 0
+//         for(let i=0; i<arr.length; i++) {
+//             arr[i].then(resolve, reason => {
+//                 //记录失败的次数
+//                 rejectCount++
+//                 //如果失败等于传入数组的长度，则返回错误。
+//                 if(rejectCount === arr.length) {
+//                     reject('All promises rejected')
+//                 }
+//             })
+//         }
+//     })
+// }
+
+// //test
+// let p1 = new Promise(r => setTimeout(r, 3000, 1))
+// let p2 = new Promise((r,j) => setTimeout(j, 1000, 2))
+// let p3 = new Promise(r => setTimeout(() => r(3), 500))
+
+// Promise.any([p1, p2, p3])
+//     .then(data => console.log(data))
+//     .catch(e => console.error(e))
+
+// Promise.any('hello').then(data => console.log(data))
+
+// Promise.any('').then(data => console.log(data), reason => console.error(reason))
+
+// Promise.any([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))
+
+
+// 自制 promise.last
+// 非Promise官方API，这是自创的需求
+// 参数是一个iterable对象。比如 String, Array, Map, and Set
+// 返回一个Promise对象，当参数中最晚resolve的promise对象resolve时再resolve。如果全部reject，则reject
+// 如果iterable为空，则返回一个已经rejected的Promise
+
+Promise.last = function(iterable) {
     let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))
-    if(arr.length === 0) return Promise.reject('All promise rejected')
+    if(arr.length === 0) return Promise.reject('all promises reject')
+
     return new Promise((resolve, reject) => {
-        let rejectCount = 0
-        for(let i=0; i<arr.length; i++) {
-            arr[i].then(resolve, reason => {
-                rejectCount++
-                if(rejectCount === arr.length) {
-                    reject('All promises rejected')
-                }
-            })
-        }
+      let lastValue = null //记录下最后成功的值
+      let resolveCount = 0
+      let rejectCount = 0
+  
+      for(let i=0; i<arr.length; i++) {
+        arr[i].then(val => {
+          lastValue = val
+          resolveCount++
+        }, reason => {
+          rejectCount++
+        }).finally(() => {
+            //如果全部失败了
+          if(rejectCount === arr.length) {
+            return reject('all promises reject')
+          }
+          //成功的+失败的 === 数组的长度
+          if(resolveCount + rejectCount === arr.length) {
+            resolve(lastValue)
+          }
+        })
+      }
     })
-}
-
-//test
-let p1 = new Promise(r => setTimeout(r, 3000, 1))
-let p2 = new Promise((r,j) => setTimeout(j, 1000, 2))
-let p3 = new Promise(r => setTimeout(() => r(3), 500))
-
-Promise.any([p1, p2, p3])
-    .then(data => console.log(data))
+  }
+  
+  
+  //test
+  let p1 = new Promise(r => setTimeout(r, 3000, 1))
+  let p2 = new Promise((r,j) => setTimeout(j, 1000, 2)) //等价于下面的写法
+  let p3 = new Promise(r => setTimeout(() => r(3), 500))
+  
+  Promise.last([p1, p2, p3])
+    .then(data => console.log(data)) //1
     .catch(e => console.error(e))
+  
+  Promise.last('hello').then(data => console.log(data)) //o
+  
+  Promise.last('').then(data => console.log(data), reason => console.error(reason))   //reject
+  
+  Promise.last([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))  //3
+  
+  Promise.last([Promise.reject(4), Promise.reject(5)]).then(data => console.log(data), reason => console.error(reason))
 
-Promise.any('hello').then(data => console.log(data))
-
-Promise.any('').then(data => console.log(data), reason => console.error(reason))
-
-Promise.any([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))
