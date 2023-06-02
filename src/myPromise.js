@@ -274,50 +274,79 @@ export const pr = () => {
 // 返回一个Promise对象，当参数中最晚resolve的promise对象resolve时再resolve。如果全部reject，则reject
 // 如果iterable为空，则返回一个已经rejected的Promise
 
-Promise.last = function(iterable) {
-    let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))
-    if(arr.length === 0) return Promise.reject('all promises reject')
+// Promise.last = function(iterable) {
+//     let arr = [...iterable].map(item => item instanceof Promise ? item : Promise.resolve(item))
+//     if(arr.length === 0) return Promise.reject('all promises reject')
 
-    return new Promise((resolve, reject) => {
-      let lastValue = null //记录下最后成功的值
-      let resolveCount = 0
-      let rejectCount = 0
+//     return new Promise((resolve, reject) => {
+//       let lastValue = null //记录下最后成功的值
+//       let resolveCount = 0
+//       let rejectCount = 0
   
-      for(let i=0; i<arr.length; i++) {
-        arr[i].then(val => {
-          lastValue = val
-          resolveCount++
-        }, reason => {
-          rejectCount++
-        }).finally(() => {
-            //如果全部失败了
-          if(rejectCount === arr.length) {
-            return reject('all promises reject')
-          }
-          //成功的+失败的 === 数组的长度
-          if(resolveCount + rejectCount === arr.length) {
-            resolve(lastValue)
-          }
-        })
-      }
+//       for(let i=0; i<arr.length; i++) {
+//         arr[i].then(val => {
+//           lastValue = val
+//           resolveCount++
+//         }, reason => {
+//           rejectCount++
+//         }).finally(() => {
+//             //如果全部失败了
+//           if(rejectCount === arr.length) {
+//             return reject('all promises reject')
+//           }
+//           //成功的+失败的 === 数组的长度
+//           if(resolveCount + rejectCount === arr.length) {
+//             resolve(lastValue)
+//           }
+//         })
+//       }
+//     })
+//   }
+  
+  
+//   //test
+//   let p1 = new Promise(r => setTimeout(r, 3000, 1))
+//   let p2 = new Promise((r,j) => setTimeout(j, 1000, 2)) //等价于下面的写法
+//   let p3 = new Promise(r => setTimeout(() => r(3), 500))
+  
+//   Promise.last([p1, p2, p3])
+//     .then(data => console.log(data)) //1
+//     .catch(e => console.error(e))
+  
+//   Promise.last('hello').then(data => console.log(data)) //o
+  
+//   Promise.last('').then(data => console.log(data), reason => console.error(reason))   //reject
+  
+//   Promise.last([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))  //3
+  
+//   Promise.last([Promise.reject(4), Promise.reject(5)]).then(data => console.log(data), reason => console.error(reason))
+
+
+
+
+//手写promise.queue
+Promise.queue = function(arr, initValue) {
+  return new Promise((resolve, reject) => {
+    let sequence = Promise.resolve(initValue)
+    arr.forEach(fn => {
+      sequence = sequence.then(fn)
     })
-  }
-  
-  
-  //test
-  let p1 = new Promise(r => setTimeout(r, 3000, 1))
-  let p2 = new Promise((r,j) => setTimeout(j, 1000, 2)) //等价于下面的写法
-  let p3 = new Promise(r => setTimeout(() => r(3), 500))
-  
-  Promise.last([p1, p2, p3])
-    .then(data => console.log(data)) //1
-    .catch(e => console.error(e))
-  
-  Promise.last('hello').then(data => console.log(data)) //o
-  
-  Promise.last('').then(data => console.log(data), reason => console.error(reason))   //reject
-  
-  Promise.last([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))  //3
-  
-  Promise.last([Promise.reject(4), Promise.reject(5)]).then(data => console.log(data), reason => console.error(reason))
-
+    sequence.then(resolve, reject)
+  })
+}
+//获得ip
+function getIp() {
+  return fetch('http://rap2api.taobao.org/app/mock/245421/getIp').then(res => res.json())
+}
+//通过ip获得城市
+function getCityFromIp({ip}){
+  console.log('ip',ip)
+  return fetch('http://rap2api.taobao.org/app/mock/245421/getCity?ip='+ip).then(res => res.json())
+}
+//通过城市获得天气
+function getWeatherFromCity({city}){ 
+  return fetch('http://rap2api.taobao.org/app/mock/245421/getWeather?city='+city).then(res => res.json())
+}
+// 1. 先获得ip 2.获得城市 3. 获得天气
+// 1. 通过getIp的结果作为getCityFromIp的参数 2. 通过getCityFromIp的结果作为getWeatherFromCity的参数 3.getWeatherFromCity的结果就是then的data
+Promise.queue([getIp, getCityFromIp, getWeatherFromCity]).then(data => console.log(data) )
