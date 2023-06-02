@@ -327,7 +327,9 @@ export const pr = () => {
 //手写promise.queue
 Promise.queue = function(arr, initValue) {
   return new Promise((resolve, reject) => {
+    console.log('initValue',initValue)
     let sequence = Promise.resolve(initValue)
+    console.log('sequence',sequence)
     arr.forEach(fn => {
       sequence = sequence.then(fn)
     })
