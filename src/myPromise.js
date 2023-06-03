@@ -325,28 +325,80 @@ export const pr = () => {
 
 
 //手写promise.queue
-Promise.queue = function(arr, initValue) {
+// Promise.queue = function(arr, initValue) {
+//   return new Promise((resolve, reject) => {
+//     let sequence = Promise.resolve(initValue)
+//     arr.forEach(fn => {
+//       sequence = sequence.then(fn)
+//     })
+//     sequence.then(resolve, reject)
+//   })
+// }
+// //获得ip
+// function getIp() {
+//   return fetch('http://rap2api.taobao.org/app/mock/245421/getIp').then(res => res.json())
+// }
+// //通过ip获得城市
+// function getCityFromIp({ip}){
+//   console.log('ip',ip)
+//   return fetch('http://rap2api.taobao.org/app/mock/245421/getCity?ip='+ip).then(res => res.json())
+// }
+// //通过城市获得天气
+// function getWeatherFromCity({city}){ 
+//   return fetch('http://rap2api.taobao.org/app/mock/245421/getWeather?city='+city).then(res => res.json())
+// }
+// // 1. 先获得ip 2.获得城市 3. 获得天气
+// // 1. 通过getIp的结果作为getCityFromIp的参数 2. 通过getCityFromIp的结果作为getWeatherFromCity的参数 3.getWeatherFromCity的结果就是then的data
+// Promise.queue([getIp, getCityFromIp, getWeatherFromCity]).then(data => console.log(data) )
+
+
+// 封装一个asyncPool,控制并发数
+
+function asyncPool(fn, arr, limit=2) {
+  let args = [...arr]  //深拷贝arr
+  let currentCount = 0  //当前运行的数量 
+  let results = []
+  let settledCount = 0
+  let order = 0
+
   return new Promise((resolve, reject) => {
-    let sequence = Promise.resolve(initValue)
-    arr.forEach(fn => {
-      sequence = sequence.then(fn)
-    })
-    sequence.then(resolve, reject)
+
+    function run() {
+      //用while循环更加精准控制
+      while(currentCount<limit && args.length > 0) {
+        currentCount++  //很短的时间内数量就满了，就停止了
+        //闭包暂存i数据
+        (function(i){
+          //闭包暂存了i
+          console.log('当前请求数' + currentCount)
+          let val = args.shift()
+          //fn(val)得到的就是promise对象
+          fn(val).then(v => {
+            //保证结果的顺序和参数的顺序一致
+            results[i] = v
+          }).finally(() => {
+            settledCount++
+            currentCount--  //不管结果如何。都走完一个
+            //如果有结果的数量等于
+            // 因为 let args = [...arr]  //深拷贝arr  所以 arr的长度不变
+            if(settledCount === arr.length) {
+              resolve(results)
+            } else {
+              run()
+            }
+          })          
+        })(order++)
+      }
+    }
+    run()
   })
 }
-//获得ip
-function getIp() {
-  return fetch('http://rap2api.taobao.org/app/mock/245421/getIp').then(res => res.json())
+
+
+function getWeather(city) {
+  console.log(`开始获取${city}的天气`)
+  return fetch(`https://api2.jirengu.com/getWeather.php?city=${city}`).then(res=> res.json()).catch(err=>{console.log(err)})
 }
-//通过ip获得城市
-function getCityFromIp({ip}){
-  console.log('ip',ip)
-  return fetch('http://rap2api.taobao.org/app/mock/245421/getCity?ip='+ip).then(res => res.json())
-}
-//通过城市获得天气
-function getWeatherFromCity({city}){ 
-  return fetch('http://rap2api.taobao.org/app/mock/245421/getWeather?city='+city).then(res => res.json())
-}
-// 1. 先获得ip 2.获得城市 3. 获得天气
-// 1. 通过getIp的结果作为getCityFromIp的参数 2. 通过getCityFromIp的结果作为getWeatherFromCity的参数 3.getWeatherFromCity的结果就是then的data
-Promise.queue([getIp, getCityFromIp, getWeatherFromCity]).then(data => console.log(data) )
+
+let citys = ['北京', '上海', '杭州', '成都', '武汉', '天津', '深圳', '广州', '合肥', '郑州']
+asyncPool(getWeather, citys, 3).then(results => console.log(results)).catch(err=>{console.log(err)})
