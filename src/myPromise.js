@@ -354,27 +354,85 @@ export const pr = () => {
 
 // 封装一个asyncPool,控制并发数
 
-function asyncPool(fn, arr, limit=2) {
-  let args = [...arr]  //深拷贝arr
-  let currentCount = 0  //当前运行的数量 
-  let results = []
-  let settledCount = 0
-  let order = 0
+// function asyncPool(fn, arr, limit=2) {
+//   let args = [...arr]  //深拷贝arr
+//   let currentCount = 0  //当前运行的数量 
+//   let results = []
+//   let settledCount = 0
+//   let order = 0
 
-  return new Promise((resolve, reject) => {
-    let sequence = Promise.resolve(initValue)
-    arr.forEach(fn => {
-      sequence = sequence.then(fn)
+//   return new Promise((resolve, reject) => {
+
+//     function run() {
+//       //用while循环更加精准控制
+//       while(currentCount<limit && args.length > 0) {
+//         currentCount++  //很短的时间内数量就满了，就停止了
+//         //闭包暂存i数据
+//         (function(i){
+//           //闭包暂存了i
+//           console.log('当前请求数' + currentCount)
+//           let val = args.shift()
+//           //fn(val)得到的就是promise对象
+//           fn(val).then(v => {
+//             //保证结果的顺序和参数的顺序一致
+//             results[i] = v
+//           }).finally(() => {
+//             settledCount++
+//             currentCount--  //不管结果如何。都走完一个
+//             //如果有结果的数量等于
+//             // 因为 let args = [...arr]  //深拷贝arr  所以 arr的长度不变
+//             // 为什么不能用result来判断，是因为
+//             if(settledCount === arr.length) {
+//               resolve(results)
+//             } else {
+//               run()
+//             }
+//           })          
+//         })(order++)
+//       }
+//     }
+//     run()
+//   })
+// }
+
+
+// function getWeather(city) {
+//   console.log(`开始获取${city}的天气`)
+//   return fetch(`https://api2.jirengu.com/getWeather.php?city=${city}`).then(res=> res.json()).catch(err=>{console.log(err)})
+// }
+
+// let citys = ['北京', '上海', '杭州', '成都', '武汉', '天津', '深圳', '广州', '合肥', '郑州']
+// asyncPool(getWeather, citys, 3).then(results => console.log(results)).catch(err=>{console.log(err)})
+
+
+
+const fs = require('fs')
+// import{fs} from 
+
+
+function promisify(fn, context = null) {
+  //...args结构readFile的参数
+  return function(...args) {
+    // return一个promise对象
+    return new Promise((resolve, reject) => {
+      //promise对象什么时候会有结果呢？ 当我们真正调用readfile，fn成功才有结果
+      fn.bind(context)(...args, function(err, val) {
+        if(err !== null) reject(err)
+        else resolve(val)
+      })
     })
-    sequence.then(resolve, reject)
-  })
+  }
 }
 
+fs.readFile('readme.md', 'utf-8', (err, data) => {
+  if(err) {
+    console.error(err)
+  } else {
+    console.log(data)
+  }
+})
 
-function getWeather(city) {
-  console.log(`开始获取${city}的天气`)
-  return fetch(`https://api2.jirengu.com/getWeather.php?city=${city}`).then(res=> res.json()).catch(err=>{console.log(err)})
-}
-
-let citys = ['北京', '上海', '杭州', '成都', '武汉', '天津', '深圳', '广州', '合肥', '郑州']
-asyncPool(getWeather, citys, 3).then(results => console.log(results)).catch(err=>{console.log(err)})
+let readFile = promisify(fs.readFile)
+readFile('readme.md', 'utf-8')
+  .then(v => console.log(v))
+  .catch(err => console.error(err))
