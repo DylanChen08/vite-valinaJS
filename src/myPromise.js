@@ -381,6 +381,7 @@ function asyncPool(fn, arr, limit=2) {
             currentCount--  //不管结果如何。都走完一个
             //如果有结果的数量等于
             // 因为 let args = [...arr]  //深拷贝arr  所以 arr的长度不变
+            // 为什么不能用result来判断，是因为
             if(settledCount === arr.length) {
               resolve(results)
             } else {
