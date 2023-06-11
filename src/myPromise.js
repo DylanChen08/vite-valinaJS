@@ -406,33 +406,44 @@ export const pr = () => {
 
 
 
-const fs = require('fs')
-// import{fs} from 
+// const fs = require('fs')
+// // import{fs} from
+//
+//
+// function promisify(fn, context = null) {
+//   //...args结构readFile的参数
+//   return function(...args) {
+//     // return一个promise对象
+//     return new Promise((resolve, reject) => {
+//       //promise对象什么时候会有结果呢？ 当我们真正调用readfile，fn成功才有结果
+//       fn.bind(context)(...args, function(err, val) {
+//         if(err !== null) reject(err)
+//         else resolve(val)
+//       })
+//     })
+//   }
+// }
+//
+// fs.readFile('readme.md', 'utf-8', (err, data) => {
+//   if(err) {
+//     console.error(err)
+//   } else {
+//     console.log(data)
+//   }
+// })
+//
+// let readFile = promisify(fs.readFile)
+// readFile('readme.md', 'utf-8')
+//   .then(v => console.log(v))
+//   .catch(err => console.error(err))
 
 
-function promisify(fn, context = null) {
-  //...args结构readFile的参数
-  return function(...args) {
-    // return一个promise对象
-    return new Promise((resolve, reject) => {
-      //promise对象什么时候会有结果呢？ 当我们真正调用readfile，fn成功才有结果
-      fn.bind(context)(...args, function(err, val) {
-        if(err !== null) reject(err)
-        else resolve(val)
-      })
-    })
-  }
-}
-
-fs.readFile('readme.md', 'utf-8', (err, data) => {
-  if(err) {
-    console.error(err)
-  } else {
-    console.log(data)
-  }
-})
-
-let readFile = promisify(fs.readFile)
-readFile('readme.md', 'utf-8')
-  .then(v => console.log(v))
-  .catch(err => console.error(err))
+//宏队列、微队列
+setTimeout(() => console.log(1), 0);
+new Promise(resolve => {
+    resolve();
+    console.log(2);
+}).then(() => {
+    console.log(3);
+});
+console.log(4);
