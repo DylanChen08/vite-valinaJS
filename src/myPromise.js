@@ -439,31 +439,50 @@ export const pr = () => {
 
 
 //宏队列、微队列
-setTimeout(() => console.log(1), 0);
-new Promise(resolve => {
-    resolve();
-    console.log(2);
-}).then(() => {
-    console.log(3);
-});
-console.log(4);
+// setTimeout(() => console.log(1), 0);
+// new Promise(resolve => {
+//     resolve();
+//     console.log(2);
+// }).then(() => {
+//     console.log(3);
+// });
+// console.log(4);
 
 // 0. 给函数命名，f1,f2,f3便于分析
 
 //1.执行同步的代码，创建一个定时器，timeout：0 表示立刻将f1加入宏队列【f1】
-setTimeout(function f1 ()  {
-    //5. 拿出宏队列f1，输出1
-    console.log(1)
-}, 0);
+// setTimeout(function f1 ()  {
+//     //5. 拿出宏队列f1，输出1
+//     console.log(1)
+// }, 0);
+//
+// //2.创建一个promise对象[同步代码]，resolve的时候立刻会将f3加入微队列【f3】,并且在resolve之后输出 2 ,此时宏队列[f1]，微队列[f3]，输出2
+// new Promise(function f2 (resolve)  {
+//     resolve(); //同步
+//     console.log(2);//同步
+// }).then(function f3()  {
+//     // 4.扫描微队列[f3]拿出来，执行输出 3 ，微队列清空
+//     console.log(3);
+// });
+// // 3.console.log(4) [同步的代码]
+// console.log(4);
 
-//2.创建一个promise对象[同步代码]，resolve的时候立刻会将f3加入微队列【f3】,并且在resolve之后输出 2 ,此时宏队列[f1]，微队列[f3]，输出2
-new Promise(function f2 (resolve)  {
-    resolve(); //同步
-    console.log(2);//同步
-}).then(function f3()  {
-    // 4.扫描微队列[f3]拿出来，执行输出 3 ，微队列清空
-    console.log(3);
-});
-// 3.console.log(4) [同步的代码]
-console.log(4);
+// 1 .3 .2 4 5 ? (自己做的)
+// 1 5 3 2 4 (控制台输出)
+//宏任务、微任务案例2
+new Promise(function f1(resolve){
+    console.log(1);  // 1.
+    setTimeout(function f2() {
+        console.log(2);   //宏队列[f2]
+    });
+    resolve(1);
+}).then(function f3(res) {
+    console.log(3);      //微队列[f3]
+})
+
+setTimeout(function f4() {
+    console.log(4);  //宏队列[f2 f4]
+})
+
+console.log(5); //?
 
