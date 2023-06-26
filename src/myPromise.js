@@ -486,36 +486,55 @@ export const pr = () => {
 //
 // console.log(5); //? 同步代码先输出
 
-// 难度三颗星
-setTimeout(function f1() {
-    console.log(1)    //1. 创建定时器，立即把f1加入宏队列。此时宏队列【f1】，微队列【】；
-})
-// sync-code:同步代码
-new Promise(function f2(resolve) {
-    // 2. f2里面是同步代码 会执行f2 【输出 2】  并且立刻resolve
-    resolve()  //sync-code:同步代码
-    console.log(2) //sync-code:同步代码
-    // 3. 执行resolve之后会把f3也就是加入了微队列 此时宏队列【f1】，微队列【f3】
-    // 3.1 Q:f3要不要执行? A:还没有轮到它执行，因为下面的同步代码还没执行完毕。
-}).then(function f3() {
-    console.log(3)
-    // 5. 相当于创建一个promise对象并且立刻resolve，也相当于创建一个fullFill状态的promise对象
-    Promise.resolve().then(function f4() {
-        //5.1 当一个promise对象处于fufill状态的时候，会立即将fn加入微队列。由于刚才执行了f3 {输出3}，所以现在的微队列是空的
-        // 5.2 Promise.resolve().then(f4） 立即把f4加入微队列，现在的 宏队列【f1】微队列 【f4】 f4即将执行
-        // 5.3 拿出f4执行，{输出4}。  f4执行完城后当前状态fullfill，触发f5加入微队列
-        console.log(4)
-    }).then(function f5() {
-        // 5.4   现在的 宏队列【f1】微队列 【f5】 f5即将执行
-        Promise.resolve().then(function f6() {
-            // 5.5  f5执行完城后当前状态fullfill，触发f6加入微队列
-            // 5.6   现在的 宏队列【f1】微队列 【f6】 f6即将执行 {输出6}
-            console.log(5)
-            // 5.7  微队列为空
-        })
-    })
-    //6.0 扫描宏队列，拿出f1执行，输出1
-})
-// 4. 同步代码执行，输出6，此时同步代码执行完毕，下一步再扫描微队列依次运行并清空全部任务、扫描宏队列依次运行并清空全部任务
-console.log(6)
+// // 难度三颗星
+// setTimeout(function f1() {
+//     console.log(1)    //1. 创建定时器，立即把f1加入宏队列。此时宏队列【f1】，微队列【】；
+// })
+// // sync-code:同步代码
+// new Promise(function f2(resolve) {
+//     // 2. f2里面是同步代码 会执行f2 【输出 2】  并且立刻resolve
+//     resolve()  //sync-code:同步代码
+//     console.log(2) //sync-code:同步代码
+//     // 3. 执行resolve之后会把f3也就是加入了微队列 此时宏队列【f1】，微队列【f3】
+//     // 3.1 Q:f3要不要执行? A:还没有轮到它执行，因为下面的同步代码还没执行完毕。
+// }).then(function f3() {
+//     console.log(3)
+//     // 5. 相当于创建一个promise对象并且立刻resolve，也相当于创建一个fullFill状态的promise对象
+//     Promise.resolve().then(function f4() {
+//         //5.1 当一个promise对象处于fufill状态的时候，会立即将fn加入微队列。由于刚才执行了f3 {输出3}，所以现在的微队列是空的
+//         // 5.2 Promise.resolve().then(f4） 立即把f4加入微队列，现在的 宏队列【f1】微队列 【f4】 f4即将执行
+//         // 5.3 拿出f4执行，{输出4}。  f4执行完城后当前状态fullfill，触发f5加入微队列
+//         console.log(4)
+//     }).then(function f5() {
+//         // 5.4   现在的 宏队列【f1】微队列 【f5】 f5即将执行
+//         Promise.resolve().then(function f6() {
+//             // 5.5  f5执行完城后当前状态fullfill，触发f6加入微队列
+//             // 5.6   现在的 宏队列【f1】微队列 【f6】 f6即将执行 {输出6}
+//             console.log(5)
+//             // 5.7  微队列为空
+//         })
+//     })
+//     //6.0 扫描宏队列，拿出f1执行，输出1
+// })
+// // 4. 同步代码执行，输出6，此时同步代码执行完毕，下一步再扫描微队列依次运行并清空全部任务、扫描宏队列依次运行并清空全部任务
+// console.log(6)
 
+//1 6 2 3 4 5
+// 宏[f1] 微[]
+// 宏[] 微[]
+// 宏[f3] 微[f2]  f2执行完毕导致当前promise fufill,触发f4加入微队列,此时注意，还没轮到f3，下一步任然是释放微队列
+// 宏[f3] 微[f4]
+// 宏[] 微[]
+console.log(1)  
+setTimeout(function f1(){
+  console.log(2)
+  Promise.resolve().then(function f2() {
+      console.log(3)
+      setTimeout(function f3() {
+        console.log(4)
+      })
+  }).then(function f4() {
+      console.log(5)
+  })
+}, 0)
+console.log(6)
