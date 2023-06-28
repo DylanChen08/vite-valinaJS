@@ -543,7 +543,7 @@ export const pr = () => {
 
 //  2 5 6 3 4
 // hong[f3] wei[f4,f5]
-
+//扫描宏队列，拿出一个执行f3。因innerpro已经处于fulfilled状态resolve(1)无效。
 const pro = new Promise(function f1(resolve) {
   const innerpro = new Promise(function f2(resolve) {
     setTimeout(function f3(){
