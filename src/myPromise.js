@@ -550,7 +550,7 @@ const pro = new Promise(function f1(resolve) {
       resolve(1);
     }, 0);
     console.log(2);
-    resolve(3);
+    resolve(3); //导致.then加入薇队列
   });
   innerpro.then(function f4(res) {console.log(res)} );
   resolve(4);
