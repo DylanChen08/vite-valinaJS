@@ -526,16 +526,36 @@ export const pr = () => {
 // 宏[f3] 微[]  f2执行完毕导致当前promise fufill,触发f4加入微队列,此时注意，还没轮到f3，下一步任然是释放微队列
 // 宏[f3] 微[f4]
 // 宏[] 微[]
-console.log(1)  
-setTimeout(function f1(){
-  console.log(2)
-  Promise.resolve().then(function f2() {
-      console.log(3)
-      setTimeout(function f3() {
-        console.log(4)
-      })
-  }).then(function f4() {
-      console.log(5)
-  })
-}, 0)
-console.log(6)
+// console.log(1)  
+// setTimeout(function f1(){
+//   console.log(2)
+//   Promise.resolve().then(function f2() {
+//       console.log(3)
+//       setTimeout(function f3() {
+//         console.log(4)
+//       })
+//   }).then(function f4() {
+//       console.log(5)
+//   })
+// }, 0)
+// console.log(6)
+
+
+//  2 5 6 3 4
+// hong[f3] wei[f4,f5]
+
+const pro = new Promise(function f1(resolve) {
+  const innerpro = new Promise(function f2(resolve) {
+    setTimeout(function f3(){
+      resolve(1);
+    }, 0);
+    console.log(2);
+    resolve(3);
+  });
+  innerpro.then(function f4(res) {console.log(res)} );
+  resolve(4);
+  console.log(5);
+})
+pro.then(function f5(res) { console.log(res) });
+console.log(6);
+
