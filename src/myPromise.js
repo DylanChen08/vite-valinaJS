@@ -560,15 +560,19 @@ export const pr = () => {
 // console.log(6);
 
 
+// hong
+// wei     [f6]
+// output ['script start',]
+
 async function async1() {
   console.log('async1 start'); //相当于new promise里面的同步的代码
   await async2();             //相当于 .then()里面的同步的代码  相当于等待一个新的promise 当他resolve之后触发后面的代码
-  console.log('async1 end'); // 相当图 async2 .then里面的代码
+  console.log('async1 end'); // f6 相当图 async2 .then里面的代码
 }
 async function async2() {
   console.log('async2 start');
-  return new Promise((resolve, reject) => {
-    resolve();
+  return new Promise(function f1(resolve, reject)  {
+    resolve(); //resolve之后触发了569行的await async2()运行
     console.log('async2 promise');
   })
 }
@@ -577,12 +581,103 @@ setTimeout(function() {
   console.log('setTimeout');
 }, 0);  
 async1(); //运行async1本质上相当于创建promise对象
-new Promise(function(resolve) {
+new Promise(function f3(resolve) {
   console.log('promise1');
   resolve();
-}).then(function() {
+}).then(function f4() {
   console.log('promise2');
-}).then(function() {
+}).then(function f5() {
   console.log('promise3');
 });
 console.log('script end');
+
+// 上面的写法有点难于分析，我们把它改造成 promise的写法，就能得到精准的结果
+
+// async function async1(){
+//   console.log(1)  //实际上是new Promise里面的同步的代码 ,返回一个promise对象
+//   await 1    // resolve(1)
+//   console.log(2)   // 相当于resolve里面.then()的结果
+// }
+// let p = async1()
+// console.log(p)
+
+
+
+// function async1() {
+//   console.log(1)
+//   return new Promise((resolve, reject) => {
+//     resolve(1)
+//   }).then(()=>{
+//     console.log(`output->2`,2)
+//   })
+// }
+
+// let p =  async1()
+// console.log(`output->p`,p)
+
+
+//更复杂一些
+//code 3
+async function async2() {
+  console.log(2)
+  return 2 // 相当于return 了一个promise对象 return Promise.resolve(2)
+}
+
+async function async1(){
+  console.log(1)
+  await async2()   //相当于 .then()里面的同步的代码
+  console.log(3)  //由于async2是promise对象 所以可以改成 return async2().then(()=>console.log(3))
+}
+
+async1()
+
+
+//所以结果是
+//code 4
+// function async2() {
+//   console.log(2)
+//   return Promise.resolve(2)
+// }
+// function async1() {
+//   console.log(1)
+//   return async2()
+//     .then(() => console.log(3))
+// }
+// async1()
+
+// macrotast microtask 终极地狱难度了
+
+// code 8
+function async1() {
+  console.log('async1 start')
+  return new Promise(function f1(resolve) {    // 第3行，async 函数返回一个Promise对象，由async2()得到的Promise对象的resolve来触发自己的resovle
+    async2().then(function f2(v) { resolve(v) } )   //第4行
+  }).then(function f3() {              //第5行
+    console.log('async1 end')
+  })
+}
+
+function async2() {  
+  console.log('async2 start')
+  return new Promise(function f4(resolve2) { // 第12行，返回一个新的Promise对象，由原来async函数里return的Promise对象的resovle来触发自己的resolve
+    new Promise(function f5(resolve, reject) {  // 第13行
+      resolve()
+      console.log('async2 promise')
+    }).then(function f6() {  resolve2() })   // 第16行
+  })
+}
+
+console.log('script start')
+setTimeout(function f7() {
+  console.log('setTimeout')
+}, 0)
+async1()
+new Promise(function f8(resolve) {     //第25行
+  console.log('promise1')
+  resolve()
+}).then(function f9() {
+  console.log('promise2')
+}).then(function f10() {
+  console.log('promise3')
+});
+console.log('script end')
