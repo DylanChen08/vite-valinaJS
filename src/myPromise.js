@@ -544,18 +544,45 @@ export const pr = () => {
 //  2 5 6 3 4
 // hong[f3] wei[f4,f5]
 //扫描宏队列，拿出一个执行f3。因innerpro已经处于fulfilled状态resolve(1)无效。
-const pro = new Promise(function f1(resolve) {
-  const innerpro = new Promise(function f2(resolve) {
-    setTimeout(function f3(){
-      resolve(1);
-    }, 0);
-    console.log(2);
-    resolve(3); //导致.then加入薇队列
-  });
-  innerpro.then(function f4(res) {console.log(res)} );
-  resolve(4);
-  console.log(5);
-})
-pro.then(function f5(res) { console.log(res) });
-console.log(6);
+// const pro = new Promise(function f1(resolve) {
+//   const innerpro = new Promise(function f2(resolve) {
+//     setTimeout(function f3(){
+//       resolve(1);
+//     }, 0);
+//     console.log(2);
+//     resolve(3); //导致.then加入薇队列
+//   });
+//   innerpro.then(function f4(res) {console.log(res)} );
+//   resolve(4);
+//   console.log(5);
+// })
+// pro.then(function f5(res) { console.log(res) });
+// console.log(6);
 
+
+async function async1() {
+  console.log('async1 start'); //相当于new promise里面的同步的代码
+  await async2();             //相当于 .then()里面的同步的代码  相当于等待一个新的promise 当他resolve之后触发后面的代码
+  console.log('async1 end'); // 相当图 async2 .then里面的代码
+}
+async function async2() {
+  console.log('async2 start');
+  return new Promise((resolve, reject) => {
+    resolve();
+    console.log('async2 promise');
+  })
+}
+console.log('script start');
+setTimeout(function() {
+  console.log('setTimeout');
+}, 0);  
+async1(); //运行async1本质上相当于创建promise对象
+new Promise(function(resolve) {
+  console.log('promise1');
+  resolve();
+}).then(function() {
+  console.log('promise2');
+}).then(function() {
+  console.log('promise3');
+});
+console.log('script end');
