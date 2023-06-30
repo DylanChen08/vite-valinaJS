@@ -282,7 +282,7 @@ export const pr = () => {
 //       let lastValue = null //记录下最后成功的值
 //       let resolveCount = 0
 //       let rejectCount = 0
-  
+
 //       for(let i=0; i<arr.length; i++) {
 //         arr[i].then(val => {
 //           lastValue = val
@@ -302,23 +302,23 @@ export const pr = () => {
 //       }
 //     })
 //   }
-  
-  
+
+
 //   //test
 //   let p1 = new Promise(r => setTimeout(r, 3000, 1))
 //   let p2 = new Promise((r,j) => setTimeout(j, 1000, 2)) //等价于下面的写法
 //   let p3 = new Promise(r => setTimeout(() => r(3), 500))
-  
+
 //   Promise.last([p1, p2, p3])
 //     .then(data => console.log(data)) //1
 //     .catch(e => console.error(e))
-  
+
 //   Promise.last('hello').then(data => console.log(data)) //o
-  
+
 //   Promise.last('').then(data => console.log(data), reason => console.error(reason))   //reject
-  
+
 //   Promise.last([Promise.resolve(2), 3, Promise.reject(4)]).then(data => console.log(data))  //3
-  
+
 //   Promise.last([Promise.reject(4), Promise.reject(5)]).then(data => console.log(data), reason => console.error(reason))
 
 
@@ -344,7 +344,7 @@ export const pr = () => {
 //   return fetch('http://rap2api.taobao.org/app/mock/245421/getCity?ip='+ip).then(res => res.json())
 // }
 // //通过城市获得天气
-// function getWeatherFromCity({city}){ 
+// function getWeatherFromCity({city}){
 //   return fetch('http://rap2api.taobao.org/app/mock/245421/getWeather?city='+city).then(res => res.json())
 // }
 // // 1. 先获得ip 2.获得城市 3. 获得天气
@@ -356,7 +356,7 @@ export const pr = () => {
 
 // function asyncPool(fn, arr, limit=2) {
 //   let args = [...arr]  //深拷贝arr
-//   let currentCount = 0  //当前运行的数量 
+//   let currentCount = 0  //当前运行的数量
 //   let results = []
 //   let settledCount = 0
 //   let order = 0
@@ -387,7 +387,7 @@ export const pr = () => {
 //             } else {
 //               run()
 //             }
-//           })          
+//           })
 //         })(order++)
 //       }
 //     }
@@ -526,7 +526,7 @@ export const pr = () => {
 // 宏[f3] 微[]  f2执行完毕导致当前promise fufill,触发f4加入微队列,此时注意，还没轮到f3，下一步任然是释放微队列
 // 宏[f3] 微[f4]
 // 宏[] 微[]
-// console.log(1)  
+// console.log(1)
 // setTimeout(function f1(){
 //   console.log(2)
 //   Promise.resolve().then(function f2() {
@@ -579,7 +579,7 @@ async function async2() {
 console.log('script start');
 setTimeout(function() {
   console.log('setTimeout');
-}, 0);  
+}, 0);
 async1(); //运行async1本质上相当于创建promise对象
 new Promise(function f3(resolve) {
   console.log('promise1');
@@ -618,18 +618,18 @@ console.log('script end');
 
 //更复杂一些
 //code 3
-async function async2() {
-  console.log(2)
-  return 2 // 相当于return 了一个promise对象 return Promise.resolve(2)
-}
+// async function async2() {
+//   console.log(2)
+//   return 2 // 相当于return 了一个promise对象 return Promise.resolve(2)
+// }
 
-async function async1(){
-  console.log(1)
-  await async2()   //相当于 .then()里面的同步的代码
-  console.log(3)  //由于async2是promise对象 所以可以改成 return async2().then(()=>console.log(3))
-}
+// async function async1(){
+//   console.log(1)
+//   await async2()   //相当于 .then()里面的同步的代码
+//   console.log(3)  //由于async2是promise对象 所以可以改成 return async2().then(()=>console.log(3))
+// }
 
-async1()
+// async1()
 
 
 //所以结果是
@@ -648,36 +648,36 @@ async1()
 // macrotast microtask 终极地狱难度了
 
 // code 8
-function async1() {
-  console.log('async1 start')
-  return new Promise(function f1(resolve) {    // 第3行，async 函数返回一个Promise对象，由async2()得到的Promise对象的resolve来触发自己的resovle
-    async2().then(function f2(v) { resolve(v) } )   //第4行
-  }).then(function f3() {              //第5行
-    console.log('async1 end')
-  })
-}
+// function async1() {
+//   console.log('async1 start')
+//   return new Promise(function f1(resolve) {    // 第3行，async 函数返回一个Promise对象，由async2()得到的Promise对象的resolve来触发自己的resovle
+//     async2().then(function f2(v) { resolve(v) } )   //第4行
+//   }).then(function f3() {              //第5行
+//     console.log('async1 end')
+//   })
+// }
 
-function async2() {  
-  console.log('async2 start')
-  return new Promise(function f4(resolve2) { // 第12行，返回一个新的Promise对象，由原来async函数里return的Promise对象的resovle来触发自己的resolve
-    new Promise(function f5(resolve, reject) {  // 第13行
-      resolve()
-      console.log('async2 promise')
-    }).then(function f6() {  resolve2() })   // 第16行
-  })
-}
+// function async2() {
+//   console.log('async2 start')
+//   return new Promise(function f4(resolve2) { // 第12行，返回一个新的Promise对象，由原来async函数里return的Promise对象的resovle来触发自己的resolve
+//     new Promise(function f5(resolve, reject) {  // 第13行
+//       resolve()
+//       console.log('async2 promise')
+//     }).then(function f6() {  resolve2() })   // 第16行
+//   })
+// }
 
-console.log('script start')
-setTimeout(function f7() {
-  console.log('setTimeout')
-}, 0)
-async1()
-new Promise(function f8(resolve) {     //第25行
-  console.log('promise1')
-  resolve()
-}).then(function f9() {
-  console.log('promise2')
-}).then(function f10() {
-  console.log('promise3')
-});
-console.log('script end')
+// console.log('script start')
+// setTimeout(function f7() {
+//   console.log('setTimeout')
+// }, 0)
+// async1()
+// new Promise(function f8(resolve) {     //第25行
+//   console.log('promise1')
+//   resolve()
+// }).then(function f9() {
+//   console.log('promise2')
+// }).then(function f10() {
+//   console.log('promise3')
+// });
+// console.log('script end')
