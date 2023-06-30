@@ -4,6 +4,7 @@ import { setupCounter } from './counter.js'
 import { d } from './src/debounce.js'
 import { ff } from './src/forEach.js'
 import { pr } from './src/myPromise.js'
+import { fulfilled } from './src/fullfill'
 
 document.querySelector('#app').innerHTML = `
   <div style='height:10000px'>
@@ -27,5 +28,6 @@ setupCounter(document.querySelector('#counter'))
 d()
 ff()
 pr()
+fulfilled()
 
 // console.log(11111);
