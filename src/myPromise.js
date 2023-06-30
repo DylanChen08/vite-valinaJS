@@ -681,3 +681,22 @@ console.log('script end');
 //   console.log('promise3')
 // });
 // console.log('script end')
+
+
+new Promise((resolve, reject) => {
+  let v = Math.random()
+  if(v > 0.5) {
+    resolve(v)
+  } else {
+    reject('less than 0.5')
+  }
+}).then(v => {
+  console.log(v)
+}, reason => {
+  console.error(reason)
+})
+
+
+let p = new Promise(resolve => resolve(1))
+p.then(v => console.log(v))
+p.then(v => console.log(v))
