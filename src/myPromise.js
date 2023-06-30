@@ -564,32 +564,32 @@ export const pr = () => {
 // wei     [f6]
 // output ['script start',]
 
-async function async1() {
-  console.log('async1 start'); //相当于new promise里面的同步的代码
-  await async2();             //相当于 .then()里面的同步的代码  相当于等待一个新的promise 当他resolve之后触发后面的代码
-  console.log('async1 end'); // f6 相当图 async2 .then里面的代码
-}
-async function async2() {
-  console.log('async2 start');
-  return new Promise(function f1(resolve, reject)  {
-    resolve(); //resolve之后触发了569行的await async2()运行
-    console.log('async2 promise');
-  })
-}
-console.log('script start');
-setTimeout(function() {
-  console.log('setTimeout');
-}, 0);
-async1(); //运行async1本质上相当于创建promise对象
-new Promise(function f3(resolve) {
-  console.log('promise1');
-  resolve();
-}).then(function f4() {
-  console.log('promise2');
-}).then(function f5() {
-  console.log('promise3');
-});
-console.log('script end');
+// async function async1() {
+//   console.log('async1 start'); //相当于new promise里面的同步的代码
+//   await async2();             //相当于 .then()里面的同步的代码  相当于等待一个新的promise 当他resolve之后触发后面的代码
+//   console.log('async1 end'); // f6 相当图 async2 .then里面的代码
+// }
+// async function async2() {
+//   console.log('async2 start');
+//   return new Promise(function f1(resolve, reject)  {
+//     resolve(); //resolve之后触发了569行的await async2()运行
+//     console.log('async2 promise');
+//   })
+// }
+// console.log('script start');
+// setTimeout(function() {
+//   console.log('setTimeout');
+// }, 0);
+// async1(); //运行async1本质上相当于创建promise对象
+// new Promise(function f3(resolve) {
+//   console.log('promise1');
+//   resolve();
+// }).then(function f4() {
+//   console.log('promise2');
+// }).then(function f5() {
+//   console.log('promise3');
+// });
+// console.log('script end');
 
 // 上面的写法有点难于分析，我们把它改造成 promise的写法，就能得到精准的结果
 
@@ -683,20 +683,70 @@ console.log('script end');
 // console.log('script end')
 
 
-new Promise((resolve, reject) => {
-  let v = Math.random()
-  if(v > 0.5) {
-    resolve(v)
-  } else {
-    reject('less than 0.5')
-  }
-}).then(v => {
-  console.log(v)
-}, reason => {
-  console.error(reason)
+// new Promise((resolve, reject) => {
+//   let v = Math.random()
+//   if(v > 0.5) {
+//     resolve(v)
+//   } else {
+//     reject('less than 0.5')
+//   }
+// }).then(v => {
+//   console.log(v)
+// }, reason => {
+//   console.error(reason)
+// })
+
+
+// let p = new Promise(resolve => resolve(1))
+// p.then(v => console.log(v))
+// p.then(v => console.log(v))
+
+
+const delayer = (t) => new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve(t)
+  }, t)
 })
 
 
-let p = new Promise(resolve => resolve(1))
-p.then(v => console.log(v))
-p.then(v => console.log(v))
+// delayer(1000).then(t => {
+//   console.log(t)
+//   return t + 1000    //返回普通值
+// }).then(t => {
+//   console.log(t)
+//   console.log('end')
+// })
+
+// delayer(1000).then(t => {
+//   console.log(t)
+//   return delayer(2000)
+// }).then(t => {
+//   console.log(t)
+//   console.log('end')
+// })
+
+
+// delayer(1000).then(t => {
+//   console.log(t)
+//   return Promise.resolve(2000)
+// }).then(t => {
+//   console.log(t)
+//   console.log('end')
+// })
+
+
+delayer(1000).then(t => {
+  console.log(t)
+  return {
+    then(resolvePromise, rejectPromise ) {
+      console.log('in then')
+      // resolvePromise(3000)
+      rejectPromise('eee')
+    }
+  }
+}).then(t => {
+  console.log(t)
+  console.log('end')
+}, e => {
+  console.error('error',e)
+})
