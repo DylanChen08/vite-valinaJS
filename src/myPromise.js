@@ -702,11 +702,11 @@ export const pr = () => {
 // p.then(v => console.log(v))
 
 
-const delayer = (t) => new Promise((resolve, reject) => {
-  setTimeout(() => {
-    resolve(t)
-  }, t)
-})
+// const delayer = (t) => new Promise((resolve, reject) => {
+//   setTimeout(() => {
+//     resolve(t)
+//   }, t)
+// })
 
 
 // delayer(1000).then(t => {
@@ -735,18 +735,35 @@ const delayer = (t) => new Promise((resolve, reject) => {
 // })
 
 
-delayer(1000).then(t => {
-  console.log(t)
-  return {
-    then(resolvePromise, rejectPromise ) {
-      console.log('in then')
-      // resolvePromise(3000)
-      rejectPromise('eee')
-    }
-  }
-}).then(t => {
-  console.log(t)
-  console.log('end')
-}, e => {
-  console.error('error',e)
+// delayer(1000).then(t => {
+//   console.log(t)
+//   return {
+//     then(resolvePromise, rejectPromise ) {
+//       console.log('in then')
+//       // resolvePromise(3000)
+//       rejectPromise('eee')
+//     }
+//   }
+// }).then(t => {
+//   console.log(t)
+//   console.log('end')
+// }, e => {
+//   console.error('error',e)
+// })
+
+
+
+
+new Promise((resolve, reject) => {
+  reject('error') // 创建一个Promise对象，并且立即调用reject方法，传入错误信息'error'
+}).then(() => {
+  console.log('ok 1') // 因为上一个Promise对象被拒绝了，所以这个then回调函数不会执行
+}, (err) => {
+  console.log('error 1: ' + err) // 打印出错误信息：'error'
+}).then(() => {
+  console.log('ok 2') // 上一个then回调函数没有返回值，所以这个then回调函数依然会执行
+}, (err) => {
+  console.log('error 2: ' + err) // 上一个then回调函数没有返回值，所以这个错误处理回调函数不会执行
+}).catch(err => {
+  console.log('catch 1: ' + err) // 上面的任何一个Promise对象被拒绝时都会执行该catch回调函数，打印出错误信息：'error'
 })
