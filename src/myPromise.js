@@ -768,3 +768,113 @@ new Promise((resolve, reject) => {
   console.log('catch 1: ' + err) // 上面的任何一个Promise对象被拒绝时都会执行该catch回调函数，打印出错误信息：'error'
 })
 
+
+ 
+// code 2
+// 无论是.then .catch .finally之后都会得到一个promise对象 ，所以就能写成下面的这种形式,转化为变量。
+
+// let p1 = new Promise((resolve, reject) => {
+//   reject('error')  //p1是一个已经rejected的对象 等价于p1 = Promise.reject('error')
+// })
+// let p2 = p1.then(()=> {    //line 4
+//   console.log('ok 1')
+// }, function fn2(err) {
+//   console.log('error 1: ' +  err)
+// })
+// let p3 = p2.then(() => {   //line 9
+//   console.log('ok 2')
+// }, function fn3(err) {
+//   console.log('error 2: ' + err)
+// })
+// let p4 = p3.catch(function fn4(err) {    //line 14
+//   console.log('catch 1: ' + err)
+// })
+// console.log(p1, p2, p3, p4)
+
+
+
+//p1 Promsie[rejected]
+//p2 Promsie[pending] fullfilled  p1的reject导致了p2的圆满fullfill，当p2运行完成之后，p1的错误就没有了
+//p3 Promsie[pending] fullfilled  与p2同理
+//p4 Promsie[pending]
+
+
+
+// 如果fn2不存在呢？如code3 所示，p1.then的第二个参数没有传递
+// code 3
+// let p1 = new Promise((resolve, reject) => {
+//   reject('error')
+// })
+// // p2没有处理错误，p2也是处于rejected的状态,p2会记录p1的错误
+// let p2 = p1.then(()=> {    //line 4
+//   console.log('ok 1')
+// })  //注意这里.then没第二个函数参数
+// let p3 = p2.then(() => {   //line 7
+//   console.log('ok 2')
+// }, function fn3(err) {     // line9
+//   console.log('error 2: ' + err)  //处理了p1一直遗留下来的reject
+// })
+// let p4 = p3.catch(function fn4(err) {    //line 12
+//   console.log('catch 1: ' + err)
+// })
+// console.log(p1, p2, p3, p4)
+
+
+
+// code 5
+// let p1 = new Promise((resolve, reject) => {
+//   reject('error')
+// })
+// let p2 = p1.then(()=> {    //line 4
+//   console.log('ok 1')
+// })  //注意这里.then没第二个函数参数
+// let p3 = p2.then(() => {   //line 7
+//   console.log('ok 2')
+// }, function fn3(err) {     // line9
+//   console.log('error 2: ' + err)
+//   throw 'error 3'          // line11 注意这里 throw了错误，p3会变成rejected状态，错误会交给后续处理
+// })
+// let p4 = p3.catch(function fn4(err) {    //line 13
+//   console.log('catch 1: ' + err)
+// })
+// console.log(p1, p2, p3, p4)
+
+
+//code 6
+new Promise((resolve, reject) => {
+  reject('error')                 //2
+}).then(()=> {
+  console.log('ok 1')             //4
+}, (err) => {
+  console.log('error 1:' +  err)  //6
+}).then(() => {
+  console.log('ok 2')             //8
+}, (err) => {
+  console.log('error 2:' + err)  //10
+}).then(() => {
+  console.log('ok 3')            //12
+}, (err) => {
+  console.log('error 3:' + err)  //14
+}).catch(err => {
+  console.log('catch 1:' + err)  //16
+}).finally(() => {
+  console.log('finally 1')       //18
+}).then(() => {
+  console.log('ok 4')            //19
+}, (err) => {
+  console.log('error 4:' + err)  //20
+}).finally(() => {
+  console.log('finally 2')       //22
+}).catch(err => {
+  console.log('catch 2:' +  err)  //24
+})
+
+
+// 以上代码运行结果是
+
+// "error 1:error"
+// "ok 2"
+// "ok 3"
+// "finally 1"
+// "ok 4"
+// "finally 2"
