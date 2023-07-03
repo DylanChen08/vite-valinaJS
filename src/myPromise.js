@@ -767,3 +767,4 @@ new Promise((resolve, reject) => {
 }).catch(err => {
   console.log('catch 1: ' + err) // 上面的任何一个Promise对象被拒绝时都会执行该catch回调函数，打印出错误信息：'error'
 })
+
