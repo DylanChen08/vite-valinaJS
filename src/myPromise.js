@@ -639,7 +639,7 @@ export const pr = () => {
 //   return Promise.resolve(2)
 // }
 // function async1() {
-//   console.log(1)
+//   console.log(1) 
 //   return async2()
 //     .then(() => console.log(3))
 // }
